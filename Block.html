@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SolSocial - Merkeziyetsiz Sosyal Medya</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(45deg, #9945ff, #14f195);
+            --bg-light: #f8f9fa;
+            --card-shadow: rgba(0,0,0,0.1);
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            color: #333;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        /* Splash Screen */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeOut 1s ease-out 3s forwards;
+        }
+        
+        .splash-logo {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 900;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: logoFloat 2s ease-in-out infinite;
+            text-align: center;
+        }
+        
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes fadeOut {
+            to { opacity: 0; visibility: hidden; }
+        }
+        
+        /* Navbar */
+        .navbar {
+            background: white !important;
+            box-shadow: 0 2px 10px var(--card-shadow);
+            padding: 1rem 0;
+        }
+        
+        .navbar-brand {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+        }
+        
+        .nav-link {
+            color: #333 !important;
+            font-weight: 500;
+            margin: 0 0.5rem;
+            border-radius: 8px;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background: rgba(153, 69, 255, 0.1);
+            color: #9945ff !important;
+        }
+        
+        .btn-gradient {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(153, 69, 255, 0.3);
+            color: white;
+        }
+        
+        /* Cards */
+        .card-custom {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .card-custom:hover {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        /* Forms */
+        .form-control-custom {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control-custom:focus {
+            background: white;
+            border-color: #14f195;
+            box-shadow: 0 0 0 0.2rem rgba(20, 241, 149, 0.25);
+        }
+        
+        /* Avatar */
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .avatar-lg {
+            width: 120px;
+            height: 120px;
+            font-size: 3rem;
+        }
+        
+        /* Post Actions */
+        .post-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .post-action {
+            cursor: pointer;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            border: 1px solid transparent;
+        }
+        
+        .post-action:hover {
+            background: rgba(153, 69, 255, 0.1);
+            color: #9945ff;
+            border-color: rgba(153, 69, 255, 0.2);
+        }
+        
+        .post-action.liked {
+            color: #dc3545;
+        }
+        
+        /* Trending */
+        .trending-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin-bottom: 0.25rem;
+        }
+        
+        .trending-item:hover {
+            background: rgba(20, 241, 149, 0.1);
+            color: #14f195;
+        }
+        
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 10000;
+            max-width: 350px;
+            animation: slideIn 0.3s ease-out;
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 10px 30px var(--card-shadow);
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 10px;
+            }
+            
+            .splash-logo {
+                font-size: 2.5rem;
+            }
+            
+            .navbar-toggler {
+                border: none;
+                padding: 0.25rem 0.5rem;
+            }
+            
+            .notification {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splash">
+        <div class="splash-logo">◆ SolSocial</div>
+        <p class="lead text-muted mt-3">Merkeziyetsiz Sosyal Medyanın Geleceği</p>
+        <div class="spinner-border text-success mt-3" role="status"></div>
+    </div>
+
+    <!-- Navbar - Sadece giriş yapınca görünür -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNavbar" style="display: none;">
+        <div class="container">
+            <a class="navbar-brand" href="#">◆ SolSocial</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav me-auto">
+                    <a class="nav-link active" href="#" onclick="showPage('feed')">Ana Sayfa</a>
+                    <a class="nav-link" href="#" onclick="showPage('profile')">Profil</a>
+                    <a class="nav-link" href="#" onclick="showPage('wallet')">Cüzdan</a>
+                </div>
+                <button class="btn btn-gradient" id="walletBtn" onclick="connectWallet()">
+                    <ion-icon name="wallet-outline"></ion-icon> Cüzdan Bağla
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container" id="mainContainer">
+        <!-- Login Page -->
+        <div id="login" class="page">
+            <div class="row justify-content-center" style="min-height: 100vh; align-items: center;">
+                <div class="col-12 col-md-8 col-lg-6">
+                    <div class="card card-custom">
+                        <div class="card-body p-4 p-md-5 text-center">
+                            <h1 class="mb-3" style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">SolSocial'e Hoş Geldin</h1>
+                            <p class="text-muted mb-4">Merkeziyetsiz sosyal medyanın geleceğini deneyimle</p>
+                            
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <input type="email" class="form-control form-control-custom" placeholder="E-posta adresiniz" required>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="password" class="form-control form-control-custom" placeholder="Şifreniz" required>
+                                </div>
+                                <button type="submit" class="btn btn-gradient w-100 mb-3">Giriş Yap</button>
+                            </form>
+                            
+                            <hr class="my-4">
+                            <button class="btn btn-outline-dark w-100 mb-3" onclick="connectPhantom()">
+                                <ion-icon name="logo-electron"></ion-icon> Phantom ile Bağlan
+                            </button>
+                            
+                            <div class="text-center">
+                                <button class="btn btn-outline-secondary btn-sm" onclick="demoLogin()">
+                                    Demo Hesap ile Giriş
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feed Page -->
+        <div id="feed" class="page d-none" style="margin-top: 5rem; padding-top: 1rem;">
+            <div class="row">
+                <!-- Left Sidebar -->
+                <div class="col-lg-3 d-none d-lg-block">
+                    <div class="card card-custom">
+                        <div class="card-header bg-transparent border-0">
+                            <h5 class="text-success mb-0"><ion-icon name="flame"></ion-icon> Trendler</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="trending-item">#Web3Sosyal</div>
+                            <div class="trending-item">#SolanaEkosistemi</div>
+                            <div class="trending-item">#DeFiYaşam</div>
+                            <div class="trending-item">#NFTTopluluğu</div>
+                            <div class="trending-item">#KriptoHaber</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Feed -->
+                <div class="col-lg-6 col-12">
+                    <!-- Post Composer -->
+                    <div class="card card-custom mb-4">
+                        <div class="card-body">
+                            <textarea class="form-control form-control-custom mb-3" rows="3" placeholder="Bugün aklından neler geçiyor?" id="postInput"></textarea>
+                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-success btn-sm"><ion-icon name="camera-outline"></ion-icon></button>
+                                    <button class="btn btn-outline-success btn-sm"><ion-icon name="videocam-outline"></ion-icon></button>
+                                    <button class="btn btn-outline-success btn-sm"><ion-icon name="bar-chart-outline"></ion-icon></button>
+                                </div>
+                                <button class="btn btn-gradient" onclick="createPost()">Paylaş</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Posts -->
+                    <div id="postsContainer">
+                        <div class="card card-custom mb-3">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="avatar me-3">A</div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">Ahmet Kripto</h6>
+                                        <small class="text-muted">@ahmet_kripto • 2dk</small>
+                                    </div>
+                                </div>
+                                <p class="mb-3">Web3 sosyal medya gerçekten geleceğin platformu! Artık verilerimizin kontrolü bizde 🚀 #Web3 #Solana</p>
+                                <div class="post-actions">
+                                    <div class="post-action" data-action="comment">
+                                        <ion-icon name="chatbubble-outline"></ion-icon>
+                                        <span class="count">12</span>
+                                    </div>
+                                    <div class="post-action" data-action="share">
+                                        <ion-icon name="repeat-outline"></ion-icon>
+                                        <span class="count">5</span>
+                                    </div>
+                                    <div class="post-action" data-action="like">
+                                        <ion-icon name="heart-outline"></ion-icon>
+                                        <span class="count">24</span>
+                                    </div>
+                                    <div class="post-action" data-action="tip">
+                                        <ion-icon name="diamond-outline"></ion-icon>
+                                        <span>Bahşiş</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card card-custom mb-3">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="avatar me-3">M</div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">Merve NFT</h6>
+                                        <small class="text-muted">@merve_nft • 5dk</small>
+                                    </div>
+                                </div>
+                                <p class="mb-3">Yeni NFT koleksiyonum hazır! Solana ağında mint edilecek. Topluluk için özel indirim var 🎨✨</p>
+                                <div class="post-actions">
+                                    <div class="post-action" data-action="comment">
+                                        <ion-icon name="chatbubble-outline"></ion-icon>
+                                        <span class="count">8</span>
+                                    </div>
+                                    <div class="post-action" data-action="share">
+                                        <ion-icon name="repeat-outline"></ion-icon>
+                                        <span class="count">15</span>
+                                    </div>
+                                    <div class="post-action" data-action="like">
+                                        <ion-icon name="heart-outline"></ion-icon>
+                                        <span class="count">42</span>
+                                    </div>
+                                    <div class="post-action" data-action="tip">
+                                        <ion-icon name="diamond-outline"></ion-icon>
+                                        <span>Bahşiş</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar -->
+                <div class="col-lg-3 d-none d-lg-block">
+                    <div class="card card-custom mb-3" style="background: var(--primary-gradient); color: white;">
+                        <div class="card-body text-center">
+                            <h6 class="mb-1">Toplam Bakiye</h6>
+                            <h3 class="mb-1">12.45 SOL</h3>
+                            <small>≈ ₺24,500</small>
+                        </div>
+                    </div>
+                    
+                    <div class="card card-custom">
+                        <div class="card-body">
+                            <div class="row g-2 mb-3">
+                                <div class="col-6"><button class="btn btn-outline-primary btn-sm w-100">Gönder</button></div>
+                                <div class="col-6"><button class="btn btn-outline-primary btn-sm w-100">Al</button></div>
+                                <div class="col-6"><button class="btn btn-outline-primary btn-sm w-100">Stake</button></div>
+                                <div class="col-6"><button class="btn btn-outline-primary btn-sm w-100">Takas</button></div>
+                            </div>
+                            <hr>
+                            <h6 class="text-success mb-2">Platform Token</h6>
+                            <h5 class="mb-1">2,450 SOLS</h5>
+                            <small class="text-muted">≈ ₺2,450</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profile" class="page d-none" style="margin-top: 5rem; padding-top: 1rem;">
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-8">
+                    <div class="card card-custom text-center">
+                        <div class="card-body p-4 p-md-5">
+                            <div class="avatar avatar-lg mx-auto mb-3">K</div>
+                            <h2 class="mb-2">Kullanıcı Adı</h2>
+                            <p class="text-muted mb-2">7xKs...9mWp (Kopyalamak için tıkla)</p>
+                            <p class="mb-4">Web3 teknolojileri ve merkeziyetsiz sistemler hakkında paylaşımlar yapıyorum 🚀</p>
+                            
+                            <div class="row text-center">
+                                <div class="col-6 col-md-3 mb-3 mb-md-0">
+                                    <h5 class="text-success mb-1">1,234</h5>
+                                    <small class="text-muted">Takipçi</small>
+                                </div>
+                                <div class="col-6 col-md-3 mb-3 mb-md-0">
+                                    <h5 class="text-success mb-1">456</h5>
+                                    <small class="text-muted">Takip</small>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <h5 class="text-success mb-1">89</h5>
+                                    <small class="text-muted">Gönderi</small>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <h5 class="text-success mb-1">12</h5>
+                                    <small class="text-muted">NFT</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wallet Page -->
+        <div id="wallet" class="page d-none" style="margin-top: 5rem; padding-top: 1rem;">
+            <div class="row">
+                <div class="col-12 col-md-6 mb-4">
+                    <div class="card card-custom text-center">
+                        <div class="card-header bg-transparent">
+                            <h5 class="text-success mb-0">SOL Bakiyesi</h5>
+                        </div>
+                        <div class="card-body">
+                            <h2 class="mb-2">12.45</h2>
+                            <p class="text-muted mb-3">≈ ₺24,500</p>
+                            <div class="row g-2">
+                                <div class="col-6"><button class="btn btn-outline-primary w-100">Gönder</button></div>
+                                <div class="col-6"><button class="btn btn-outline-primary w-100">Al</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 mb-4">
+                    <div class="card card-custom text-center">
+                        <div class="card-header bg-transparent">
+                            <h5 class="text-success mb-0">SOLS Token</h5>
+                        </div>
+                        <div class="card-body">
+                            <h2 class="mb-2">2,450</h2>
+                            <p class="text-muted mb-3">≈ ₺2,450</p>
+                            <div class="row g-2">
+                                <div class="col-6"><button class="btn btn-outline-primary w-100">Stake</button></div>
+                                <div class="col-6"><button class="btn btn-outline-primary w-100">Takas</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card card-custom">
+                <div class="card-header bg-transparent">
+                    <h5 class="text-success mb-0">İşlem Geçmişi</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center py-3 border-bottom">
+                        <div class="mb-2 mb-sm-0">
+                            <h6 class="mb-1">SOL Gönderildi</h6>
+                            <small class="text-muted">7xKs...9mWp → 4nBt...8hQx</small>
+                        </div>
+                        <span class="text-danger fw-bold">-2.5 SOL</span>
+                    </div>
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center py-3 border-bottom">
+                        <div class="mb-2 mb-sm-0">
+                            <h6 class="mb-1">SOLS Token Kazanıldı</h6>
+                            <small class="text-muted">Gönderi ödülü</small>
+                        </div>
+                        <span class="text-success fw-bold">+50 SOLS</span>
+                    </div>
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center py-3">
+                        <div class="mb-2 mb-sm-0">
+                            <h6 class="mb-1">Bahşiş Alındı</h6>
+                            <small class="text-muted">@ahmet_kripto kullanıcısından</small>
+                        </div>
+                        <span class="text-success fw-bold">+0.1 SOL</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentUser = null;
+        let isWalletConnected = false;
+        
+        // Cüzdan bakiyeleri
+        let walletBalance = {
+            sol: 12.45,
+            sols: 2450,
+            usdRate: 100 // 1 SOL = 100 TL
+        };
+
+        $(document).ready(function() {
+            // Splash screen'i gizle
+            setTimeout(() => $('#splash').fadeOut(), 3500);
+            
+            // Login form
+            $('#loginForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                const email = $(this).find('input[type="email"]').val();
+                const password = $(this).find('input[type="password"]').val();
+                
+                if (email && password) {
+                    // Kullanıcı oluştur
+                    currentUser = { 
+                        name: 'Kullanıcı', 
+                        username: '@kullanici', 
+                        avatar: 'K' 
+                    };
+                    
+                    // Giriş yap
+                    loginUser();
+                } else {
+                    showNotification('Lütfen e-posta ve şifrenizi girin! ⚠️', 'warning');
+                }
+            });
+            
+            // Trending clicks
+            $('.trending-item').on('click', function() {
+                showNotification(`${$(this).text()} aranıyor... 🔍`, 'info');
+            });
+            
+            // Post actions
+            $(document).on('click', '.post-action', function() {
+                const action = $(this).data('action');
+                const $this = $(this);
+                
+                if (action === 'like') {
+                    const $icon = $this.find('ion-icon');
+                    const $count = $this.find('.count');
+                    const currentCount = parseInt($count.text());
+                    
+                    if ($this.hasClass('liked')) {
+                        $icon.attr('name', 'heart-outline');
+                        $count.text(currentCount - 1);
+                        $this.removeClass('liked');
+                        showNotification('Beğeni kaldırıldı! 💔', 'info');
+                    } else {
+                        $icon.attr('name', 'heart');
+                        $count.text(currentCount + 1);
+                        $this.addClass('liked');
+                        showNotification('Gönderi beğenildi! ❤️', 'success');
+                    }
+                } else if (action === 'share') {
+                    const $count = $this.find('.count');
+                    const currentCount = parseInt($count.text());
+                    $count.text(currentCount + 1);
+                    showNotification('Gönderi paylaşıldı! 🔄', 'success');
+                } else if (action === 'comment') {
+                    showNotification('Yorum özelliği yakında! 💬', 'info');
+                } else if (action === 'tip') {
+                    if (!isWalletConnected) {
+                        showNotification('Bahşiş göndermek için cüzdan bağlayın! 💳', 'warning');
+                    } else {
+                        sendTip();
+                    }
+                }
+            });
+        });
+
+        // Bakiye güncelleme
+        function updateBalance() {
+            const solValue = walletBalance.sol.toFixed(2);
+            const tlValue = (walletBalance.sol * walletBalance.usdRate).toLocaleString('tr-TR');
+            
+            // Ana bakiye kartını güncelle
+            $('.card-custom h3:contains("SOL")').text(`${solValue} SOL`);
+            $('.card-custom small:contains("₺")').text(`≈ ₺${tlValue}`);
+            
+            // Sidebar bakiyesini güncelle
+            $('[style*="primary-gradient"] h3').text(`${solValue} SOL`);
+            $('[style*="primary-gradient"] small').text(`≈ ₺${tlValue}`);
+            
+            // Cüzdan sayfası bakiyesini güncelle
+            $('#wallet .card-custom h2').first().text(solValue);
+            $('#wallet .card-custom p').first().text(`≈ ₺${tlValue}`);
+        }
+
+        // Bahşiş gönderme
+        function sendTip() {
+            // Bahşiş miktarını sor
+            const tipAmount = prompt('Kaç SOL bahşiş göndermek istiyorsunuz?', '0.1');
+            
+            if (!tipAmount || tipAmount === '' || tipAmount === null) {
+                return;
+            }
+            
+            const amount = parseFloat(tipAmount);
+            
+            if (isNaN(amount) || amount <= 0) {
+                showNotification('Geçerli bir miktar girin! ⚠️', 'warning');
+                return;
+            }
+            
+            if (amount > walletBalance.sol) {
+                showNotification('Yetersiz bakiye! Mevcut bakiyeniz: ' + walletBalance.sol.toFixed(2) + ' SOL 💸', 'error');
+                return;
+            }
+            
+            // Bakiyeden düş
+            walletBalance.sol -= amount;
+            
+            // Bakiyeyi güncelle
+            updateBalance();
+            
+            // İşlem geçmişine ekle
+            addTransaction('Bahşiş Gönderildi', `@kullanıcıya bahşiş`, `-${amount} SOL`);
+            
+            showNotification(`${amount} SOL bahşiş başarıyla gönderildi! 💰`, 'success');
+            
+            // 2 saniye sonra blockchain onayı simüle et
+            setTimeout(() => {
+                showNotification('İşlem blockchain\'de onaylandı! ✅', 'success');
+            }, 2000);
+        }
+
+        // İşlem geçmişine ekleme
+        function addTransaction(title, description, amount) {
+            const isPositive = amount.startsWith('+');
+            const colorClass = isPositive ? 'text-success' : 'text-danger';
+            
+            const transactionHTML = `
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center py-3 border-bottom">
+                    <div class="mb-2 mb-sm-0">
+                        <h6 class="mb-1">${title}</h6>
+                        <small class="text-muted">${description}</small>
+                    </div>
+                    <span class="${colorClass} fw-bold">${amount}</span>
+                </div>
+            `;
+            
+            // Cüzdan sayfasındaki işlem geçmişine ekle
+            $('#wallet .card-body').last().prepend(transactionHTML);
+        }
+
+        // Sayfa gösterme
+        function showPage(pageId) {
+            $('.page').addClass('d-none');
+            $(`#${pageId}`).removeClass('d-none');
+            $('.nav-link').removeClass('active');
+            $(`.nav-link[onclick="showPage('${pageId}')"]`).addClass('active');
+            $('.navbar-collapse').collapse('hide');
+        }
+
+        // Giriş yapma
+        function loginUser() {
+            $('#mainNavbar').show();
+            $('#login').addClass('d-none');
+            $('#feed').removeClass('d-none');
+            updateBalance(); // İlk bakiye güncellemesi
+            showNotification('SolSocial\'e hoş geldiniz! 🎉', 'success');
+        }
+
+        // Demo giriş
+        function demoLogin() {
+            $('#loginForm input[type="email"]').val('demo@solsocial.com');
+            $('#loginForm input[type="password"]').val('demo123');
+            showNotification('Demo bilgileri dolduruldu! Giriş Yap\'a tıklayın. 👆', 'info');
+        }
+
+        // Phantom bağlantısı
+        function connectPhantom() {
+            if (!currentUser) {
+                showNotification('Önce giriş yapın! 🔐', 'warning');
+                return;
+            }
+            
+            isWalletConnected = true;
+            $('#walletBtn').html('<ion-icon name="wallet"></ion-icon> Bağlandı');
+            showNotification('Phantom cüzdan bağlandı! 👻', 'success');
+        }
+
+        // Cüzdan bağlama
+        function connectWallet() {
+            if (!isWalletConnected) {
+                connectPhantom();
+            } else {
+                showNotification('Cüzdan zaten bağlı! 💳', 'info');
+            }
+        }
+
+        // Gönderi oluşturma
+        function createPost() {
+            const content = $('#postInput').val().trim();
+            
+            if (!content) {
+                showNotification('Lütfen bir şeyler yazın! ✍️', 'warning');
+                return;
+            }
+            
+            if (!currentUser) {
+                showNotification('Gönderi paylaşmak için giriş yapın! 🔐', 'warning');
+                return;
+            }
+            
+            const postHTML = `
+                <div class="card card-custom mb-3">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar me-3">${currentUser.avatar}</div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">${currentUser.name}</h6>
+                                <small class="text-muted">${currentUser.username} • şimdi</small>
+                            </div>
+                        </div>
+                        <p class="mb-3">${content}</p>
+                        <div class="post-actions">
+                            <div class="post-action" data-action="comment">
+                                <ion-icon name="chatbubble-outline"></ion-icon>
+                                <span class="count">0</span>
+                            </div>
+                            <div class="post-action" data-action="share">
+                                <ion-icon name="repeat-outline"></ion-icon>
+                                <span class="count">0</span>
+                            </div>
+                            <div class="post-action" data-action="like">
+                                <ion-icon name="heart-outline"></ion-icon>
+                                <span class="count">0</span>
+                            </div>
+                            <div class="post-action" data-action="tip">
+                                <ion-icon name="diamond-outline"></ion-icon>
+                                <span>Bahşiş</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            $('#postsContainer').prepend(postHTML);
+            $('#postInput').val('');
+            
+            // Gönderi ödülü ver
+            walletBalance.sols += 10;
+            updateBalance();
+            addTransaction('SOLS Token Kazanıldı', 'Gönderi paylaşım ödülü', '+10 SOLS');
+            
+            showNotification('Gönderi paylaşıldı! +10 SOLS kazandınız! 🎉', 'success');
+        }
+
+        // Bildirim gösterme
+        function showNotification(message, type) {
+            const alertClass = type === 'success' ? 'alert-success' : 
+                              type === 'warning' ? 'alert-warning' : 
+                              type === 'error' ? 'alert-danger' : 'alert-info';
+            
+            const notification = $(`
+                <div class="alert ${alertClass} notification alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `);
+            
+            $('body').append(notification);
+            setTimeout(() => notification.alert('close'), 3000);
+        }
+    </script>
+</body>
+</html>
